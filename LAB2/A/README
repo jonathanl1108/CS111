@@ -1,0 +1,134 @@
+NAME: Jonathan Liau
+EMAIL: jonathanl1108@g.ucla.edu
+ID: 105182103
+
+lab2_add.c: 
+	C code that can demonstrates race condition by applying yield and different locks such as mutex ,spin and compare swap
+lab2_list.c:
+	C code that that can demonstrates race condition by applying yield and different locks such as mutex ,spin with a sorted doublylink list 
+SortedList.h: 
+	header file that contains the definition of struct and sort list interface 
+SortedList.c:
+	C code that has the implementation of four function defined in SortedList.h.
+lab2_add.csv: 
+	File that contains output from the test code which has important data to produce graphs 
+lab2_list.csv: 
+	File that contains output from the test code which has important data to produce graphs 
+lab2_add.gp:
+lab2_list.gp: 
+	Provided scripts for plotting data points
+Makefile:
+	contains 
+	make
+	make dist
+	make test
+	make clean 
+
+Tar file contains:
+Lab2_add-1.png
+Lab2_add-2.png
+Lab2_add-3.png
+Lab2_add-4.png
+Lab2_add-5.png
+Lab2_list-1.png
+Lab2_list-2.png
+Lab2_list-4.png
+Lab2_list-5.png
+lab2_add.c: 
+SortedList.h: 
+SortedList.c:
+lab2_list.c:
+lab2_add.csv: 
+lab2_list.csv: 
+lab2_add.gp:
+lab2_list.gp: 
+
+
+
+
+QUESTION 2.1.1 - causing conflicts:
+Why does it take many iterations before errors are seen?
+Why does a significantly smaller number of iterations so seldom fail?
+
+when the iteration is small, the threads are less likely to get preempted 
+because the threads are allow to complete the working function add in each scheduled 
+time slice, therefore, the problem with race condition is less likely to occurred. 
+on the other hand, as the number of iteration goes up, the thread will not be able 
+to complete the full add in the scheduled time slice, thus the more error could occurred 
+due to the race condition between the threads. 
+
+
+QUESTION 2.1.2 - cost of yielding:
+Why are the --yield runs so much slower?
+Where is the additional time going?
+Is it possible to get valid per-operation timings if we are using the --yield option?
+If so, explain how. If not, explain why not.
+
+the process of yield is for a thread to be willing to get relinquish 
+on the current process, and therefore the reason that --yield runs so much 
+slower is because the addtional times will be spend for context switch, in other words
+the reason of the slowness is from the context switch and rescheduling. 
+Secondly, it is not possible to measured the valid per-operation timings
+since the performance we measured is recording from the beginning and 
+the ending of the process and we cant get the cost of context switching.
+
+QUESTION 2.1.3 - measurement errors:
+Why does the average cost per operation drop with increasing iterations?
+If the cost per iteration is a function of the number of iterations, how do we know how many iterations to run (or what the "correct" cost is)?
+
+The cost per iteration is define as
+	time_per_operation = diff / operation_count
+where 
+	opeariton_count  = 2 * (long long) thread_num * (long long)iter_num
+In the graph generated in add_3.png the cost per iteration and the number of iteration 
+is in a inversely relationship. we therefore see that the cost of iteration becomes more
+significant to the cost of creating the threads. 
+
+A way to find the correct cost will be using the function that we define for the 
+cost per iteration vs number of iterations, and run good amount of different combination 
+of iteration and threads. As we take the limit to be infinity large, we will eventually 
+see the curve reach some constant value( perhaps a negative exponential curve). 
+
+
+QUESTION 2.1.4 - costs of serialization:
+Why do all of the options perform similarly for low numbers of threads?
+Why do the three protected operations slow down as the number of threads rises?
+
+when the number of threads are low, the conflicts are less likely to happen,
+since each thread will be able to access the working add function without racing. 
+without the conflict yielding and lock will not really affect the performance after all
+therefore all of the options perform similarly. On the other hand, when the number of threads
+rise, protected operations slow down because of the overhead for the threads to wait for lock
+and context switch from yielding. therefore, the threads will spend extra time waiting for its turn 
+to hold the lock. 
+
+QUESTION 2.2.1 - scalability of Mutex
+Compare the variation in time per mutex-protected operation vs the number of threads in Part-1 (adds) and Part-2 (sorted lists).
+Comment on the general shapes of the curves, and explain why they have this shape.
+Comment on the relative rates of increase and differences in the shapes of the curves, and offer an explanation for these differences.
+
+The curve for time per mutex-protected operation vs the number of threads in Part-1 
+increases as the number of threads grows, however the slope started to flatten as the number of
+threads reach four. A reasonable explanation will be that the critical
+section for add function is relatively short, and as more threads support, the cost of
+operation gradually decreases.On the other hand, the curve for time per mutex-protected operation vs the number of threads in Part-2
+didn't really seems to be affected by the number of threads. In part-2 the critical section with mutext protection is 
+much longer than the adding function, since it need to preform insert, lookup and delete. In other words, the cost of protection 
+is much more significant in compare to the performance improvements from multithreading. 
+
+
+QUESTION 2.2.2 - scalability of spin locks
+
+Compare the variation in time per protected operation vs the number of threads for list operations protected by Mutex vs Spin locks. Comment on the general shapes of the curves, and explain why they have this shape.
+Comment on the relative rates of increase and differences in the shapes of the curves, and offer an explanation for these differences.
+
+The mutex and spin lock for the list operation is significantly different.
+as mentioned in the above question, the cost of mutex protection didn't really
+seems to be effected by the number of threads. However, in the case of spin lock 
+the curve grows exponentially as the number of threads grows. A reasonable explanation is 
+that there exist a threshold between the cost of spin lock overhead and the number 
+of threads. Once the number of threads hits such threshold, the the thread will be all fighting for
+the spin lock, and the threads will spend much more time in while loop for the lock to be release by
+other thread instead of preforming the list operations.
+
+
