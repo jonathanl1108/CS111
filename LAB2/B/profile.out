@@ -1,0 +1,263 @@
+Total: 625 samples
+     521  83.4%  83.4%      625 100.0% thread_worker
+      20   3.2%  86.6%       20   3.2% ?? /usr/src/debug////////glibc-2.17-c758a686/string/../sysdeps/x86_64/multiarch/strcmp-sse42.S:204
+      17   2.7%  89.3%       50   8.0% SortedList_insert
+      13   2.1%  91.4%       54   8.6% SortedList_lookup
+      12   1.9%  93.3%       12   1.9% ?? /usr/src/debug////////glibc-2.17-c758a686/string/../sysdeps/x86_64/multiarch/strcmp-sse42.S:1734
+      10   1.6%  94.9%       10   1.6% ?? /usr/src/debug////////glibc-2.17-c758a686/string/../sysdeps/x86_64/multiarch/strcmp-sse42.S:1734
+       8   1.3%  96.2%        8   1.3% ?? /usr/src/debug////////glibc-2.17-c758a686/string/../sysdeps/x86_64/multiarch/strcmp-sse42.S:1734
+       4   0.6%  96.8%        4   0.6% ?? /usr/src/debug////////glibc-2.17-c758a686/string/../sysdeps/x86_64/multiarch/strcmp-sse42.S:164
+       4   0.6%  97.4%        4   0.6% ?? /usr/src/debug////////glibc-2.17-c758a686/string/../sysdeps/x86_64/multiarch/strcmp-sse42.S:206
+       4   0.6%  98.1%        4   0.6% ?? /usr/src/debug////////glibc-2.17-c758a686/string/../sysdeps/x86_64/multiarch/strcmp-sse42.S:1734
+       3   0.5%  98.6%        3   0.5% ?? /usr/src/debug////////glibc-2.17-c758a686/string/../sysdeps/x86_64/multiarch/strcmp-sse42.S:161
+       3   0.5%  99.0%        3   0.5% ?? /usr/src/debug////////glibc-2.17-c758a686/string/../sysdeps/x86_64/multiarch/strcmp-sse42.S:212
+       2   0.3%  99.4%        2   0.3% ?? /usr/src/debug////////glibc-2.17-c758a686/string/../sysdeps/x86_64/multiarch/strcmp-sse42.S:203
+       2   0.3%  99.7%        2   0.3% ?? /usr/src/debug////////glibc-2.17-c758a686/string/../sysdeps/x86_64/multiarch/strcmp-sse42.S:211
+       1   0.2%  99.8%        1   0.2% ?? /usr/src/debug////////glibc-2.17-c758a686/string/../sysdeps/x86_64/multiarch/strcmp-sse42.S:1733
+       1   0.2% 100.0%        1   0.2% _init
+       0   0.0% 100.0%      625 100.0% ?? /usr/src/debug////////glibc-2.17-c758a686/misc/../sysdeps/unix/sysv/linux/x86_64/clone.S:118
+       0   0.0% 100.0%      625 100.0% start_thread
+ROUTINE ====================== thread_worker in /u/cs/ugrad/yutseng/cs111_20/lab2b/lab2_list.c
+   521    625 Total samples (flat / cumulative)
+     .      .  171:         sum += key[i];
+     .      .  172:     return sum % sub_list;
+     .      .  173: }
+     .      .  174: 
+     .      .  175: 
+---
+     .      .  176: void* thread_worker( void* keySet ) {
+     .      .  177: 
+     .      .  178:     /**
+     .      .  179:      * starts with a set of pre-allocated and initialized elements (--iterations=#)
+     .      .  180:         inserts them all into the multi-list (which sublist the key should go into determined by a hash of the key)
+     .      .  181:         gets the list length
+     .      .  182:         looks up and deletes each of the keys it inserted
+     .      .  183:         exits to re-join the parent thread
+     .      .  184:      * 
+     .      .  185:      * 
+     .      .  186:      * 
+     .      .  187:      * 
+     .      .  188:     */
+     .      .  189:     // printf("GOt here 1 \n");
+     .      .  190:     SortedListElement_t* m_key_set_head = keySet;
+     .      .  191: 	struct timespec lkw_begin, lkw_end;
+     .      .  192:     int i;
+     .      .  193:     int index;
+     .      .  194:     long total_list_len = 0;
+     .      .  195: 	for (i = 0; i < num_iter; i++) {
+     .      .  196: 		index = hash(m_key_set_head[i].key);
+     .      .  197:         // start waitting
+     .      .  198: 		clock_gettime(CLOCK_MONOTONIC, &lkw_begin);
+     .      .  199: 		if (opt_mLock) {
+     .      .  200: 	        	pthread_mutex_lock(&mutextlock[index]);
+     .      .  201: 	    	} else if (opt_sLock) {
+   358    358  202: 	    		while (__sync_lock_test_and_set(&is_slock_held[index], 1));
+     .      .  203: 	    	}
+     .      .  204:         // end waitting 
+     .      .  205: 	   	clock_gettime(CLOCK_MONOTONIC, &lkw_end);
+     .      .  206: 		wait_time += get_nanosec_from_timespec(&lkw_end)-get_nanosec_from_timespec(&lkw_begin);  //diff stores the execution time in ns
+     .      .  207:         // printf("GOt here 1-2-test %s \n",head[index].key);
+     .     50  208:         SortedList_insert(&head[index], &m_key_set_head[i]);
+     .      .  209:         //    printf("GOt here 2 \n");
+     .      .  210:     	if (opt_mLock) {
+     .      .  211:         		pthread_mutex_unlock(&mutextlock[index]);
+     .      .  212:    		} else if (opt_sLock) {
+     .      .  213:         		__sync_lock_release(&is_slock_held[index]);
+     .      .  214:     	}
+     .      .  215: 	}
+     .      .  216:    //gets the list length
+     .      .  217:    //figure out how to (safely and correctly) obtain the length of the list, which now involves enumerating all of the sub-lists.
+     .      .  218:     for (i = 0; i < sub_list; i++) {
+     .      .  219:      	if (opt_mLock) {
+     .      .  220: 	        clock_gettime(CLOCK_MONOTONIC, &lkw_begin);
+     .      .  221: 	        pthread_mutex_lock(&mutextlock[i]);
+     .      .  222: 	        clock_gettime(CLOCK_MONOTONIC, &lkw_end);
+     .      .  223:       	} else if (opt_sLock) {
+     .      .  224:             clock_gettime(CLOCK_MONOTONIC, &lkw_begin);
+     .      .  225:          	while (__sync_lock_test_and_set(&is_slock_held[i], 1))
+     .      .  226:              {
+     .      .  227: 
+     .      .  228:              };
+     .      .  229:             clock_gettime(CLOCK_MONOTONIC, &lkw_end);
+     .      .  230:       	}
+     .      .  231:         wait_time += get_nanosec_from_timespec(&lkw_end)-get_nanosec_from_timespec(&lkw_begin);  //diff stores the execution time in ns
+     .      .  232:     }
+     .      .  233: 
+     .      .  234:    	for (i = 0; i < sub_list ; i++)
+     .      .  235:     		total_list_len += SortedList_length(&head[i]);
+     .      .  236: 	
+     .      .  237: 	if (total_list_len < num_iter) {
+     .      .  238: 		fprintf(stderr, "synchronization error resulted in a corrupted list.\n");
+     .      .  239:         //safeExist();
+     .      .  240:         exit(2);
+     .      .  241: 	}
+     .      .  242: 
+     .      .  243: 	for (i = 0; i < sub_list ; i++)
+     .      .  244:     {
+     .      .  245:       if (opt_mLock) {
+     .      .  246:         	pthread_mutex_unlock(&mutextlock[i]);
+     .      .  247:    		} else if (opt_sLock) {
+     .      .  248:         	__sync_lock_release(&is_slock_held[i]);
+     .      .  249:     	}
+     .      .  250:     }
+     .      .  251: 
+     .      .  252: //  printf("GOt here 4 \n");
+     .      .  253:     //looks up and deletes each of the keys it inserted
+     .      .  254: 	for (i = 0; i < num_iter; i++) 
+     .      .  255:     {
+     .      .  256:         index = hash(m_key_set_head[i].key);
+     .      .  257:         clock_gettime(CLOCK_MONOTONIC, &lkw_begin);
+     .      .  258: 		if (opt_mLock) {
+     .      .  259: 	        	pthread_mutex_lock(&mutextlock[index]);
+     .      .  260: 	    	} else if (opt_sLock) {
+   163    163  261: 	    		while (__sync_lock_test_and_set(&is_slock_held[index], 1));
+     .      .  262: 	    	}
+     .      .  263:         // end waitting 
+     .      .  264: 	   	clock_gettime(CLOCK_MONOTONIC, &lkw_end);
+     .      .  265: 		wait_time += get_nanosec_from_timespec(&lkw_end)-get_nanosec_from_timespec(&lkw_begin);  //diff stores the execution time in ns
+     .      .  266: 
+     .     54  267:         SortedListElement_t *killme = SortedList_lookup(&head[index], m_key_set_head[i].key);
+     .      .  268: 
+     .      .  269:         if (killme == NULL || SortedList_delete(killme)) 
+     .      .  270:         {
+     .      .  271:             fprintf(stderr, "synchronization error resulted in a corrupted list during delet.\n");
+     .      .  272:             exit(2);
+     .      .  273:         }
+     .      .  274: 
+     .      .  275: 		if (opt_mLock) {
+     .      .  276:         		pthread_mutex_unlock(&mutextlock[index]);
+     .      .  277:    		} else if (opt_sLock) {
+     .      .  278:         		__sync_lock_release(&is_slock_held[index]);
+     .      .  279:     	}
+     .      .  280: 	}
+     .      .  281: 
+     .      .  282:     return NULL;
+     .      .  283: }
+---
+     .      .  284: 
+     .      .  285: void creatOp_Output()
+     .      .  286: {
+     .      .  287:     /*
+     .      .  288:      the name of the test, which is of the form: list-yieldopts-syncopts:
+ROUTINE ====================== thread_worker in /u/cs/ugrad/yutseng/cs111_20/lab2b/lab2_list.c
+   521    625 Total samples (flat / cumulative)
+     .      .  171:         sum += key[i];
+     .      .  172:     return sum % sub_list;
+     .      .  173: }
+     .      .  174: 
+     .      .  175: 
+---
+     .      .  176: void* thread_worker( void* keySet ) {
+     .      .  177: 
+     .      .  178:     /**
+     .      .  179:      * starts with a set of pre-allocated and initialized elements (--iterations=#)
+     .      .  180:         inserts them all into the multi-list (which sublist the key should go into determined by a hash of the key)
+     .      .  181:         gets the list length
+     .      .  182:         looks up and deletes each of the keys it inserted
+     .      .  183:         exits to re-join the parent thread
+     .      .  184:      * 
+     .      .  185:      * 
+     .      .  186:      * 
+     .      .  187:      * 
+     .      .  188:     */
+     .      .  189:     // printf("GOt here 1 \n");
+     .      .  190:     SortedListElement_t* m_key_set_head = keySet;
+     .      .  191: 	struct timespec lkw_begin, lkw_end;
+     .      .  192:     int i;
+     .      .  193:     int index;
+     .      .  194:     long total_list_len = 0;
+     .      .  195: 	for (i = 0; i < num_iter; i++) {
+     .      .  196: 		index = hash(m_key_set_head[i].key);
+     .      .  197:         // start waitting
+     .      .  198: 		clock_gettime(CLOCK_MONOTONIC, &lkw_begin);
+     .      .  199: 		if (opt_mLock) {
+     .      .  200: 	        	pthread_mutex_lock(&mutextlock[index]);
+     .      .  201: 	    	} else if (opt_sLock) {
+   358    358  202: 	    		while (__sync_lock_test_and_set(&is_slock_held[index], 1));
+     .      .  203: 	    	}
+     .      .  204:         // end waitting 
+     .      .  205: 	   	clock_gettime(CLOCK_MONOTONIC, &lkw_end);
+     .      .  206: 		wait_time += get_nanosec_from_timespec(&lkw_end)-get_nanosec_from_timespec(&lkw_begin);  //diff stores the execution time in ns
+     .      .  207:         // printf("GOt here 1-2-test %s \n",head[index].key);
+     .     50  208:         SortedList_insert(&head[index], &m_key_set_head[i]);
+     .      .  209:         //    printf("GOt here 2 \n");
+     .      .  210:     	if (opt_mLock) {
+     .      .  211:         		pthread_mutex_unlock(&mutextlock[index]);
+     .      .  212:    		} else if (opt_sLock) {
+     .      .  213:         		__sync_lock_release(&is_slock_held[index]);
+     .      .  214:     	}
+     .      .  215: 	}
+     .      .  216:    //gets the list length
+     .      .  217:    //figure out how to (safely and correctly) obtain the length of the list, which now involves enumerating all of the sub-lists.
+     .      .  218:     for (i = 0; i < sub_list; i++) {
+     .      .  219:      	if (opt_mLock) {
+     .      .  220: 	        clock_gettime(CLOCK_MONOTONIC, &lkw_begin);
+     .      .  221: 	        pthread_mutex_lock(&mutextlock[i]);
+     .      .  222: 	        clock_gettime(CLOCK_MONOTONIC, &lkw_end);
+     .      .  223:       	} else if (opt_sLock) {
+     .      .  224:             clock_gettime(CLOCK_MONOTONIC, &lkw_begin);
+     .      .  225:          	while (__sync_lock_test_and_set(&is_slock_held[i], 1))
+     .      .  226:              {
+     .      .  227: 
+     .      .  228:              };
+     .      .  229:             clock_gettime(CLOCK_MONOTONIC, &lkw_end);
+     .      .  230:       	}
+     .      .  231:         wait_time += get_nanosec_from_timespec(&lkw_end)-get_nanosec_from_timespec(&lkw_begin);  //diff stores the execution time in ns
+     .      .  232:     }
+     .      .  233: 
+     .      .  234:    	for (i = 0; i < sub_list ; i++)
+     .      .  235:     		total_list_len += SortedList_length(&head[i]);
+     .      .  236: 	
+     .      .  237: 	if (total_list_len < num_iter) {
+     .      .  238: 		fprintf(stderr, "synchronization error resulted in a corrupted list.\n");
+     .      .  239:         //safeExist();
+     .      .  240:         exit(2);
+     .      .  241: 	}
+     .      .  242: 
+     .      .  243: 	for (i = 0; i < sub_list ; i++)
+     .      .  244:     {
+     .      .  245:       if (opt_mLock) {
+     .      .  246:         	pthread_mutex_unlock(&mutextlock[i]);
+     .      .  247:    		} else if (opt_sLock) {
+     .      .  248:         	__sync_lock_release(&is_slock_held[i]);
+     .      .  249:     	}
+     .      .  250:     }
+     .      .  251: 
+     .      .  252: //  printf("GOt here 4 \n");
+     .      .  253:     //looks up and deletes each of the keys it inserted
+     .      .  254: 	for (i = 0; i < num_iter; i++) 
+     .      .  255:     {
+     .      .  256:         index = hash(m_key_set_head[i].key);
+     .      .  257:         clock_gettime(CLOCK_MONOTONIC, &lkw_begin);
+     .      .  258: 		if (opt_mLock) {
+     .      .  259: 	        	pthread_mutex_lock(&mutextlock[index]);
+     .      .  260: 	    	} else if (opt_sLock) {
+   163    163  261: 	    		while (__sync_lock_test_and_set(&is_slock_held[index], 1));
+     .      .  262: 	    	}
+     .      .  263:         // end waitting 
+     .      .  264: 	   	clock_gettime(CLOCK_MONOTONIC, &lkw_end);
+     .      .  265: 		wait_time += get_nanosec_from_timespec(&lkw_end)-get_nanosec_from_timespec(&lkw_begin);  //diff stores the execution time in ns
+     .      .  266: 
+     .     54  267:         SortedListElement_t *killme = SortedList_lookup(&head[index], m_key_set_head[i].key);
+     .      .  268: 
+     .      .  269:         if (killme == NULL || SortedList_delete(killme)) 
+     .      .  270:         {
+     .      .  271:             fprintf(stderr, "synchronization error resulted in a corrupted list during delet.\n");
+     .      .  272:             exit(2);
+     .      .  273:         }
+     .      .  274: 
+     .      .  275: 		if (opt_mLock) {
+     .      .  276:         		pthread_mutex_unlock(&mutextlock[index]);
+     .      .  277:    		} else if (opt_sLock) {
+     .      .  278:         		__sync_lock_release(&is_slock_held[index]);
+     .      .  279:     	}
+     .      .  280: 	}
+     .      .  281: 
+     .      .  282:     return NULL;
+     .      .  283: }
+---
+     .      .  284: 
+     .      .  285: void creatOp_Output()
+     .      .  286: {
+     .      .  287:     /*
+     .      .  288:      the name of the test, which is of the form: list-yieldopts-syncopts:
