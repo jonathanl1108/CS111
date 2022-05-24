@@ -1,0 +1,48 @@
+NAME: Jonathan Liau
+EMAIL: jonathanl1108@g.ucla.edu
+ID: 105182103
+
+lab0.c:
+     A C program implementation that allows the follwing options
+     --input=[file name];
+        user specification of the input file as stdin
+     --output=file name]
+        user specification of the output file as stdout
+     --segfault
+        Cause a segmentation fault by forcing an invlaid access to a null pointer
+     --catch 
+        Triggereed the handler and catch a SIGSEGV signal if the "--segfault" option is applied
+
+Makefile 
+    - lab0
+        builds an executable lab0 from lab0.c with 
+	    gcc -Wall -Wextra -g -o lab0 lab0.c
+    - check
+        run a shell script basictest.sh
+        Test Includes:
+            1) Check if the program can open an exsisiting file with input --option with no error
+            2) Check if compare if the output print in stdout match with orginal file
+            3) Test both --input and --output option when use together, by comparing if the specfic input and output file are identical 
+            4) Check if error message is prompted and correct when an invalid input file is used with --input option 
+            5) Check if error message is prompted and correct when an when unable to create a file with --output option 
+            6) Test both 4 and 5 together when both --input and --output option are presented 
+            7) Check if segmentation fault error is triggered when option --segfault is applied by check if exit status code is 139
+            8) Check if the sigsegfault_handler propely catptures the segfault signal and prompt the correct error message when --segfault is applied
+    - clean 
+        remove all files and object created when using make command 
+    - dist 
+        Creaing a distribution tarball that including 
+        lab0.c basictest.sh Makefile backtrace.png breakpoint.png README
+
+        backtrace.png: 
+        screenshot of the stack backtrace while running --segfault using gdb 
+
+        breakpoint.png: 
+        screenshot that inspect the pointer that trigger segfault while running --segfault 
+        at the specfic breakpoint found in backtrace and prints the value of the pointer
+	
+	basictest.sh: a series of smoke test used by make check 
+
+
+
+
