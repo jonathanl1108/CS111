@@ -1,0 +1,18 @@
+NAME: Jonathan Liau
+EMAIL: jonathanl1108@g.ucla.edu
+ID: 105182103
+
+partner
+: Lawrence Lin
+: lawlung99@gmail.com
+: 305097439
+
+lab3b.py: a python program that takes in a csv file 
+            and verify the considenecy of the disk layout
+            against with the information provided by the 
+            super block and group descriptor 
+run_lab3b:  a shell script that runs the python program
+Makefile :
+    clean : remove files created by the program 
+    dist : create a tar file that contian Makefile README run_lab3b lab3b.py
+    
