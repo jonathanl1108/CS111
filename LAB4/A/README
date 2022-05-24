@@ -1,0 +1,29 @@
+#NAME: Jonathan Liau
+#EMAIL: jonathanliau747@gmail.com
+#ID: 105182103
+
+Serial number BBGW18031245
+MAC(wlan0 HWaddr) 2c:f7:f1:06:78:dc
+
+
+my_beaglebone.jpg:
+	picture of me and the Beaglebone 
+connected.png:
+	screenshot of the output of ifconfig after the Beagle Bone is change to name 105182103.lasr.cs.ucla.edu 
+copy.png:
+	contains a screenshot of a local session in which I copy a hello world program from my desktop through scp
+build_run.png:
+	contains a screenshot from a WIFI SSH session in which I build and run a my hello world program through gcc command 
+git.png:
+	contains a screenshot from a WIFI SSH session in which I git the local file into my GitHub and cone it though git clone <URL>
+Makefile:
+	dist that create a tar ball that contains the following files
+	my_beaglebone.jpg
+	connected.png
+	copy.png
+	build_run.png
+	git.png
+	Makefile
+	README	
+
+
