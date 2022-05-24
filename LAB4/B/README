@@ -1,0 +1,50 @@
+#NAME: Jonathan Liau
+#EMAIL: jonathanliau747@gmail.com
+#ID: 105182103
+
+lab4b.c: 
+	A C program that is supported by beaglebone which will report the temperature and
+	output the time in the form hr:min:sec tempertur(C/F)
+	the program supports the following options 
+	--period= time : allows the user to decided the frequency of temperature report in seconds 
+	--scale=[C/F]  : the temperature report is by default using F, and can be change by --scale=C
+	--log=file name : allows the user to stdout to a specific file 
+	
+	Upon the options, the program will also monitor STDIN and process the following keywords 
+	SCALE=F
+		This command will change the reports to be generated in degrees Fahrenheit.
+	SCALE=C
+		This command will change the reports to be generated in degrees C
+	PERIOD=seconds
+		This command should change the number of seconds between reporting intervals
+	STOP
+		This command should cause the program to stop generating reports
+	START
+		This command should let the command to resume if once stopped 
+	LOG 
+		Takes no action in lab4b
+		
+	OFF
+		Same effects as pressing the button, which will let the program ended 
+check.sh:
+	a python shell script that will do a series of smoke test for lab4b.c 
+	
+
+Makefile:
+	build: gcc -o lab4b -g -lm -lmraa -Wall -Wextra lab4b.c
+	check: runs a test program test.sh for standard smoke test 
+	clean: removes lab4b and tar file
+	dist: creates a tar ball that consist:
+			Makefile
+			lab4b.c
+			README
+			check.sh
+	
+	
+Reference:
+How to time the period:
+https://www.quora.com/What-can-I-do-to-insert-a-30-second-timer-in-C-programs
+MRAA examples :
+https://iotdk.intel.com/docs/master/mraa/classmraa_1_1_gpio.html 
+some basic way to write proper test script 
+P4B_check.sh 
