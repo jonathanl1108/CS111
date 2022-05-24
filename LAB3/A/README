@@ -1,0 +1,22 @@
+NAME:Jonathan Liau
+EMAIL:jonathanliau747@gmail.com
+ID:105182103
+
+partner
+: Lawrence Lin
+: lawlung99@gmail.com
+: 305097439
+
+lab3a.c: A C source code that explores the file system of ext2
+        it will analysis the block groups in the system, which in each group
+        the superblock, block bit maps, inode bit maps and inode table will
+        be traverse by the program and outputs the corresponding offset along withe name of directory
+Makefile:
+        build : gcc -g -Wall -Wextra -o lab3a lab3a.c
+        clean : clean up tar files
+        dist: contains lab3a.c ext2_fs.h Makefile README
+
+reference:
+http://cs.smith.edu/~nhowe/Teaching/csc262/oldlabs/kernel/ext2_fs.h
+https://www.ibm.com/support/knowledgecenter/ssw_ibm_i_72/apis/pread.htm
+http://cs.smith.edu/~nhowe/Teaching/csc262/oldlabs/ext2.html
