@@ -1,0 +1,47 @@
+NAME: Jonathan Liau
+EMAIL: jonathanl1108@g.ucla.edu
+ID: 105182103
+
+lab1b-client.c:
+    A C program implementation that allows the follwing options
+    --port= portnumber : specify the port number to make connection with the server
+    --log = filename : crete a file that trace the data that are send and receieved through the network 
+        with format SENT # bytes: or RECEIVED # bytes:
+    --compress :compression to reduce the amount of space data takes up asssit with zlib 
+      compression and decompression
+
+lab1b-server.c:
+     A C program implementation that allows the follwing options
+        --port= portnumber : specify the port number for the server
+        --compress :compression to reduce the amount of space data takes up asssit with zlib 
+        compression and decompression
+        --shell creates a new process throught thr fork command, where the child process execute a /bin/bash 
+        with the command recieved from the terminal and output stdout or stderr back to the terminal 
+
+        if shell opt has been applied then at the exit it will output an addtional Exit status report with 
+        waitpid and WIFEXITED(status) in the form 
+        SHELL EXIT SIGNAL=# STATUS=#
+
+     * read (ASCII) input from the keyboard, 
+        1) echo it to stdout,  <cr> or <lf> should echo as <cr><lf> 
+        2) forward it to the shell, <cr> or <lf> should go to shell as <lf>
+    * read input from the shell pipe and write it to stdout. 
+        1)If it receives an <lf> from the shell, it should print it to the screen as <cr><lf>.
+
+  
+
+Makefile 
+    - lab1b
+        builds an executable lab0 from all needed .c files with 
+	    gcc -Wall -Wextra -lz -g -o lab1b-client lab1b-client.c
+	    gcc -Wall -Wextra -lz -g -o lab1b-server lab1b-server.c
+    - clean 
+        remove all files and object created when using make command 
+    - dist 
+        Creaing a distribution tarball that including 
+        lab1a.c  Makefile  README
+
+
+
+
+
